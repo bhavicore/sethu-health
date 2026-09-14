@@ -1,0 +1,17 @@
+{
+  "name": "sethu-server",
+  "version": "1.0.0",
+  "description": "Central data store for Sethu — accepts synced visit records from PHC/CHC clients and simulates ABDM/ABHA linkage.",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "better-sqlite3": "^13.0.3",
+    "cors": "^2.8.6",
+    "express": "^5.2.1"
+  }
+}
