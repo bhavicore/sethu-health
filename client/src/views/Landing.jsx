@@ -1,21 +1,27 @@
+const CHOICES = [
+  { role: 'desk', title: 'Registration Desk', desc: 'Look up a returning patient or register a new one, before the doctor sees them.' },
+  { role: 'doctor', title: 'Doctor Console', desc: 'History first, then dictate. The agent drafts, flags, and never blocks.' },
+  { role: 'inventory', title: 'PHC Inventory', desc: 'Stock, usage trends, surge flags, and agent-drafted indents.' },
+  { role: 'chc', title: 'CHC', desc: 'Scan referral cards, review incoming indents, manage CHC stock.' },
+  { role: 'phc', title: 'Referral (legacy demo)', desc: 'The original offline QR referral-card bridge between a PHC and a CHC.' },
+];
+
 export default function Landing({ onSelect }) {
   return (
     <div className="landing">
       <div className="landing__brand">
         <h1>SETHU</h1>
-        <p>Offline-first digital health records for rural India</p>
+        <p>An honest prototype: consultation, inventory, and offline referral — for rural India</p>
       </div>
       <div className="landing__choices">
-        <button className="landing__choice" onClick={() => onSelect('phc')}>
-          <span className="landing__choice-title">PHC Staff</span>
-          <span className="landing__choice-desc">Log a patient visit and generate a referral card</span>
-        </button>
-        <button className="landing__choice" onClick={() => onSelect('chc')}>
-          <span className="landing__choice-title">CHC Doctor</span>
-          <span className="landing__choice-desc">Scan a referral card and see history instantly</span>
-        </button>
+        {CHOICES.map((c) => (
+          <button key={c.role} className="landing__choice" onClick={() => onSelect(c.role)}>
+            <span className="landing__choice-title">{c.title}</span>
+            <span className="landing__choice-desc">{c.desc}</span>
+          </button>
+        ))}
       </div>
-      <p className="landing__footnote">No login needed. Works offline.</p>
+      <p className="landing__footnote">Synthetic demo data only. Doctors and Medical Officers approve everything.</p>
     </div>
   );
 }

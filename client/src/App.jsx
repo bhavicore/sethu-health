@@ -3,16 +3,35 @@ import './App.css';
 import Landing from './views/Landing';
 import PhcView from './views/PhcView';
 import ChcView from './views/ChcView';
+import DeskView from './views/DeskView';
+import DoctorConsoleView from './views/DoctorConsoleView';
+import InventoryView from './views/InventoryView';
 import SyncStatusBar from './components/SyncStatusBar';
 import { initSyncEngine } from './lib/sync';
 
+const NAV_ITEMS = [
+  { role: 'desk', label: 'Desk' },
+  { role: 'doctor', label: 'Doctor' },
+  { role: 'inventory', label: 'Inventory' },
+  { role: 'chc', label: 'CHC' },
+  { role: 'phc', label: 'Referral (legacy)' },
+];
+
 export default function App() {
   const [role, setRole] = useState(null);
+  const [activePatientId, setActivePatientId] = useState(null);
+  const [doctorName, setDoctorName] = useState('Dr. Anitha Selvam');
+  const [doctorRegNo, setDoctorRegNo] = useState('TN-MC-44210');
 
   useEffect(() => {
     const stop = initSyncEngine();
     return stop;
   }, []);
+
+  function sendToDoctor(patientId) {
+    setActivePatientId(patientId);
+    setRole('doctor');
+  }
 
   return (
     <div className="app">
@@ -22,18 +41,15 @@ export default function App() {
         </button>
         {role && (
           <div className="app__nav-links">
-            <button
-              className={role === 'phc' ? 'app__nav-link app__nav-link--active' : 'app__nav-link'}
-              onClick={() => setRole('phc')}
-            >
-              PHC
-            </button>
-            <button
-              className={role === 'chc' ? 'app__nav-link app__nav-link--active' : 'app__nav-link'}
-              onClick={() => setRole('chc')}
-            >
-              CHC
-            </button>
+            {NAV_ITEMS.map((item) => (
+              <button
+                key={item.role}
+                className={role === item.role ? 'app__nav-link app__nav-link--active' : 'app__nav-link'}
+                onClick={() => setRole(item.role)}
+              >
+                {item.label}
+              </button>
+            ))}
           </div>
         )}
         <SyncStatusBar />
@@ -41,8 +57,18 @@ export default function App() {
 
       <main className="app__main">
         {!role && <Landing onSelect={setRole} />}
-        {role === 'phc' && <PhcView />}
+        {role === 'desk' && <DeskView onSendToDoctor={sendToDoctor} />}
+        {role === 'doctor' && (
+          <DoctorConsoleView
+            activePatientId={activePatientId}
+            doctorName={doctorName}
+            doctorRegNo={doctorRegNo}
+            onDoctorIdentityChange={({ doctorName: n, doctorRegNo: r }) => { setDoctorName(n); setDoctorRegNo(r); }}
+          />
+        )}
+        {role === 'inventory' && <InventoryView facilityId="phc-1" />}
         {role === 'chc' && <ChcView />}
+        {role === 'phc' && <PhcView />}
       </main>
     </div>
   );

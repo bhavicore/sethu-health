@@ -455,3 +455,91 @@ dd {
 .history-result dl {
   text-align: left;
 }
+
+/* Mic button */
+.mic-btn {
+  border: none;
+  background: var(--primary-light);
+  color: var(--primary-dark);
+  border-radius: 999px;
+  width: 1.8rem;
+  height: 1.8rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  line-height: 1;
+  margin-left: 0.4rem;
+}
+
+.mic-btn--active {
+  background: var(--danger);
+  color: white;
+}
+
+/* History panel */
+.history-panel h2 {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.history-panel details {
+  margin-top: 0.75rem;
+}
+
+/* Report table */
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.5rem 0 1rem;
+}
+
+.report-table th,
+.report-table td {
+  text-align: left;
+  padding: 0.4rem 0.6rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+
+/* Printable report */
+.report-sheet {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.5rem;
+}
+
+.report-sheet__header {
+  margin-bottom: 1rem;
+  border-bottom: 2px solid var(--primary);
+  padding-bottom: 0.5rem;
+}
+
+.report-sheet__signature {
+  margin-top: 2.5rem;
+  width: 260px;
+}
+
+.report-sheet__signature-line {
+  border-top: 1px solid var(--text);
+  margin-bottom: 0.3rem;
+}
+
+@media print {
+  .app__nav,
+  .no-print {
+    display: none !important;
+  }
+  .app__main {
+    max-width: none;
+    padding: 0;
+  }
+  .card:not(.printable-report) {
+    display: none !important;
+  }
+  .printable-report {
+    border: none;
+    box-shadow: none;
+    padding: 0;
+  }
+}

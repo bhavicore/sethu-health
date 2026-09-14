@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { decodePayload, decodeQrFromImageFile } from '../lib/qr';
 import { saveScannedVisit, listVisits } from '../lib/db';
+import { careApi } from '../lib/careApi';
+import InventoryView from './InventoryView';
 
 const READER_ID = 'chc-qr-reader';
 
@@ -28,6 +30,7 @@ function payloadToVisit(payload) {
 }
 
 export default function ChcView() {
+  const [tab, setTab] = useState('scan');
   const [scanning, setScanning] = useState(false);
   const [decoded, setDecoded] = useState(null);
   const [error, setError] = useState(null);
@@ -109,75 +112,124 @@ export default function ChcView() {
   return (
     <div className="view">
       <header className="view__header">
-        <h1>CHC — Scan Referral</h1>
-        <p className="muted">
-          Scan the patient's QR card. No login, no internet required — the full history is in
-          the code itself.
-        </p>
+        <h1>CHC</h1>
+        <p className="muted">Scan referral cards, review incoming indents, and manage the CHC's own stock.</p>
       </header>
 
-      <section className="card scan-panel">
-        <div id={READER_ID} className="qr-reader" />
-        <div className="scan-panel__controls">
-          {!scanning ? (
-            <button className="btn btn--primary" onClick={startCamera}>
-              Start camera scan
-            </button>
-          ) : (
-            <button className="btn btn--secondary" onClick={stopCamera}>
-              Stop camera
-            </button>
-          )}
-          <label className="btn btn--secondary btn--file">
-            Upload QR image
-            <input type="file" accept="image/*" hidden onChange={handleFileChosen} />
-          </label>
-        </div>
-        {error && <p className="form-error">{error}</p>}
-      </section>
+      <div className="app__nav-links" style={{ marginBottom: '1.25rem' }}>
+        <button className={tab === 'scan' ? 'app__nav-link app__nav-link--active' : 'app__nav-link'} onClick={() => setTab('scan')} style={{ color: tab === 'scan' ? undefined : 'var(--primary-dark)', background: tab === 'scan' ? undefined : 'var(--primary-light)' }}>Scan Referral</button>
+        <button className={tab === 'indents' ? 'app__nav-link app__nav-link--active' : 'app__nav-link'} onClick={() => setTab('indents')} style={{ color: tab === 'indents' ? undefined : 'var(--primary-dark)', background: tab === 'indents' ? undefined : 'var(--primary-light)' }}>Indent Inbox</button>
+        <button className={tab === 'inventory' ? 'app__nav-link app__nav-link--active' : 'app__nav-link'} onClick={() => setTab('inventory')} style={{ color: tab === 'inventory' ? undefined : 'var(--primary-dark)', background: tab === 'inventory' ? undefined : 'var(--primary-light)' }}>CHC Inventory</button>
+      </div>
 
-      {decoded && (
-        <section className="card history-result">
-          <h2>History available instantly</h2>
-          <p className="referral-card__patient">
-            {decoded.name} · {decoded.age}{decoded.gender ? `, ${decoded.gender}` : ''}
-          </p>
-          {decoded.abha && <p className="muted small">ABHA {decoded.abha} — linked to ABDM (mock)</p>}
-          <dl>
-            <dt>PHC</dt>
-            <dd>{decoded.phc || '—'}</dd>
-            <dt>Symptoms</dt>
-            <dd>{decoded.sym || '—'}</dd>
-            <dt>Diagnosis</dt>
-            <dd>{decoded.dx || '—'}</dd>
-            <dt>Medications</dt>
-            <dd>{decoded.meds || '—'}</dd>
-            <dt>Allergies</dt>
-            <dd>{decoded.all || '—'}</dd>
-            <dt>Notes</dt>
-            <dd>{decoded.notes || '—'}</dd>
-            <dt>Visit date</dt>
-            <dd>{decoded.ts ? new Date(decoded.ts).toLocaleString() : '—'}</dd>
-          </dl>
-        </section>
+      {tab === 'scan' && (
+        <>
+          <section className="card scan-panel">
+            <div id={READER_ID} className="qr-reader" />
+            <div className="scan-panel__controls">
+              {!scanning ? (
+                <button className="btn btn--primary" onClick={startCamera}>
+                  Start camera scan
+                </button>
+              ) : (
+                <button className="btn btn--secondary" onClick={stopCamera}>
+                  Stop camera
+                </button>
+              )}
+              <label className="btn btn--secondary btn--file">
+                Upload QR image
+                <input type="file" accept="image/*" hidden onChange={handleFileChosen} />
+              </label>
+            </div>
+            {error && <p className="form-error">{error}</p>}
+          </section>
+
+          {decoded && (
+            <section className="card history-result">
+              <h2>History available instantly</h2>
+              <p className="referral-card__patient">
+                {decoded.name} · {decoded.age}{decoded.gender ? `, ${decoded.gender}` : ''}
+              </p>
+              {decoded.abha && <p className="muted small">ABHA {decoded.abha} — linked to ABDM (mock)</p>}
+              <dl>
+                <dt>PHC</dt>
+                <dd>{decoded.phc || '—'}</dd>
+                <dt>Symptoms</dt>
+                <dd>{decoded.sym || '—'}</dd>
+                <dt>Diagnosis</dt>
+                <dd>{decoded.dx || '—'}</dd>
+                <dt>Medications</dt>
+                <dd>{decoded.meds || '—'}</dd>
+                <dt>Allergies</dt>
+                <dd>{decoded.all || '—'}</dd>
+                <dt>Notes</dt>
+                <dd>{decoded.notes || '—'}</dd>
+                <dt>Visit date</dt>
+                <dd>{decoded.ts ? new Date(decoded.ts).toLocaleString() : '—'}</dd>
+              </dl>
+            </section>
+          )}
+
+          <section className="card">
+            <h2>Scanned at this device ({history.length})</h2>
+            {history.length === 0 && <p className="muted">No referral cards scanned yet.</p>}
+            <ul className="visit-list">
+              {history.map((v) => (
+                <li key={v.localId} className="visit-list__item">
+                  <div>
+                    <strong>{v.name}</strong>
+                    <span className="muted"> · {v.age}{v.gender ? `, ${v.gender}` : ''}</span>
+                    <div className="muted small">{v.diagnosis || v.symptoms || 'No diagnosis recorded'}</div>
+                  </div>
+                  <span className="muted small">{new Date(v.scannedAt).toLocaleString()}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        </>
       )}
 
-      <section className="card">
-        <h2>Scanned at this device ({history.length})</h2>
-        {history.length === 0 && <p className="muted">No referral cards scanned yet.</p>}
-        <ul className="visit-list">
-          {history.map((v) => (
-            <li key={v.localId} className="visit-list__item">
-              <div>
-                <strong>{v.name}</strong>
-                <span className="muted"> · {v.age}{v.gender ? `, ${v.gender}` : ''}</span>
-                <div className="muted small">{v.diagnosis || v.symptoms || 'No diagnosis recorded'}</div>
-              </div>
-              <span className="muted small">{new Date(v.scannedAt).toLocaleString()}</span>
-            </li>
-          ))}
-        </ul>
-      </section>
+      {tab === 'indents' && <IndentInbox />}
+      {tab === 'inventory' && <InventoryView facilityId="chc-1" />}
     </div>
+  );
+}
+
+function IndentInbox() {
+  const [indents, setIndents] = useState([]);
+  const [error, setError] = useState(null);
+
+  async function refresh() {
+    try {
+      const { indents: rows } = await careApi.listIndents('chc-1', 'incoming');
+      setIndents(rows);
+    } catch (err) {
+      setError(err.message);
+    }
+  }
+
+  useEffect(() => { refresh(); }, []);
+
+  return (
+    <section className="card">
+      <h2>Incoming indents from PHCs</h2>
+      {error && <p className="form-error">{error}</p>}
+      {indents.length === 0 && <p className="muted">No indents received yet.</p>}
+      <ul className="visit-list">
+        {indents.map((ind) => (
+          <li key={ind.id} className="visit-list__item">
+            <div>
+              <strong>{ind.medicine?.generic_name}</strong> — {ind.qty} {ind.medicine?.unit_label}
+              <div className="muted small">
+                From {ind.from_facility} · {ind.status} · {new Date(ind.created_at).toLocaleString()}
+                {ind.surge_flag ? ' · ⚠ surge' : ''}
+              </div>
+              <div className="small">{ind.justification}</div>
+            </div>
+            <span className={`badge badge--${ind.status === 'sent' ? 'pending' : 'synced'}`}>{ind.status}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }

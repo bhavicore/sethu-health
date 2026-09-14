@@ -8,6 +8,9 @@ const dbPath = process.env.SETHU_DB_PATH || path.join(__dirname, '..', 'sethu.db
 export const db = new Database(dbPath);
 db.pragma('journal_mode = WAL');
 
+// ---------------------------------------------------------------------------
+// Referral-bridge schema (Loop 0 — the original QR referral demo)
+// ---------------------------------------------------------------------------
 db.exec(`
   CREATE TABLE IF NOT EXISTS visits (
     server_id     INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -71,4 +74,170 @@ export function findVisitsByAbha(abhaId) {
 
 export function listRecentVisits(limit = 100) {
   return listStmt.all(limit);
+}
+
+// ---------------------------------------------------------------------------
+// Consultation + Inventory schema (Loop 1 / Loop 2 — task.md)
+// Synthetic demo data only. See server/src/seed.js.
+// ---------------------------------------------------------------------------
+db.exec(`
+  CREATE TABLE IF NOT EXISTS facilities (
+    id          TEXT PRIMARY KEY,
+    name        TEXT NOT NULL,
+    type        TEXT NOT NULL,          -- 'phc' | 'chc'
+    parent_id   TEXT REFERENCES facilities(id)
+  );
+
+  CREATE TABLE IF NOT EXISTS medicines (
+    id                TEXT PRIMARY KEY,  -- generic slug, e.g. 'paracetamol'
+    generic_name      TEXT NOT NULL,
+    unit_label        TEXT NOT NULL,     -- e.g. '500 mg tablet'
+    max_daily_dose_mg REAL,              -- null = no simple daily-dose ceiling (e.g. ORS)
+    nlem_code         TEXT
+  );
+
+  CREATE TABLE IF NOT EXISTS brand_generic (
+    brand     TEXT PRIMARY KEY COLLATE NOCASE,
+    medicine_id TEXT NOT NULL REFERENCES medicines(id)
+  );
+
+  CREATE TABLE IF NOT EXISTS abbreviations (
+    abbrev    TEXT PRIMARY KEY COLLATE NOCASE,
+    expansion TEXT NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS allergy_classes (
+    medicine_id TEXT NOT NULL REFERENCES medicines(id),
+    class       TEXT NOT NULL,           -- e.g. 'penicillin'
+    PRIMARY KEY (medicine_id, class)
+  );
+
+  CREATE TABLE IF NOT EXISTS interactions (
+    id        INTEGER PRIMARY KEY AUTOINCREMENT,
+    drug_a    TEXT NOT NULL,             -- medicine id or allergy-class-style generic name
+    drug_b    TEXT NOT NULL,
+    severity  TEXT NOT NULL,             -- 'major' | 'moderate' | 'minor'
+    note      TEXT NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS patients (
+    id                  TEXT PRIMARY KEY,
+    name                TEXT NOT NULL,
+    age                 INTEGER,
+    gender              TEXT,
+    phone               TEXT UNIQUE,
+    language            TEXT NOT NULL DEFAULT 'hi',   -- 'hi' | 'ta' | 'en'
+    message_format      TEXT NOT NULL DEFAULT 'text',  -- 'text' | 'voice' | 'both'
+    whatsapp_consent    INTEGER NOT NULL DEFAULT 0,
+    whatsapp_window_opened_at TEXT,
+    allergies           TEXT NOT NULL DEFAULT '[]',    -- JSON array of strings, verbatim as recorded
+    chronic_conditions  TEXT NOT NULL DEFAULT '[]',    -- JSON array of strings
+    created_at          TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+
+  CREATE TABLE IF NOT EXISTS encounters (
+    id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+    patient_id          TEXT NOT NULL REFERENCES patients(id),
+    facility_id         TEXT NOT NULL REFERENCES facilities(id),
+    doctor_name         TEXT,
+    doctor_reg_no       TEXT,
+    chief_complaint     TEXT,
+    dictation_raw       TEXT,
+    dictation_lang      TEXT,
+    normalized_text     TEXT,
+    vitals              TEXT DEFAULT '{}',   -- JSON
+    diagnosis           TEXT,
+    medications         TEXT DEFAULT '[]',   -- JSON array
+    warnings            TEXT DEFAULT '[]',   -- JSON array, as drafted
+    override_reasons    TEXT DEFAULT '[]',   -- JSON array, doctor's reasons for proceeding past warnings
+    advice_english      TEXT,
+    advice_patient_lang TEXT,
+    status              TEXT NOT NULL DEFAULT 'draft', -- 'draft' | 'approved'
+    created_at          TEXT NOT NULL DEFAULT (datetime('now')),
+    approved_at         TEXT,
+    approved_by         TEXT
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_encounters_patient ON encounters (patient_id);
+
+  CREATE TABLE IF NOT EXISTS inventory (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    facility_id   TEXT NOT NULL REFERENCES facilities(id),
+    medicine_id   TEXT NOT NULL REFERENCES medicines(id),
+    batch_no      TEXT NOT NULL,
+    expiry_date   TEXT NOT NULL,
+    stock_qty     REAL NOT NULL,
+    updated_at    TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_inventory_facility_medicine ON inventory (facility_id, medicine_id);
+
+  CREATE TABLE IF NOT EXISTS usage_history (
+    facility_id   TEXT NOT NULL REFERENCES facilities(id),
+    medicine_id   TEXT NOT NULL REFERENCES medicines(id),
+    date          TEXT NOT NULL,        -- 'YYYY-MM-DD'
+    qty_used      REAL NOT NULL DEFAULT 0,
+    PRIMARY KEY (facility_id, medicine_id, date)
+  );
+
+  CREATE TABLE IF NOT EXISTS medicine_facility_settings (
+    facility_id        TEXT NOT NULL REFERENCES facilities(id),
+    medicine_id        TEXT NOT NULL REFERENCES medicines(id),
+    seasonal_multiplier REAL NOT NULL DEFAULT 1.0,
+    surge_months       TEXT NOT NULL DEFAULT '[]', -- JSON array of month numbers (1-12) set by the MO
+    lead_time_days     REAL NOT NULL DEFAULT 3,
+    safety_stock_days  REAL NOT NULL DEFAULT 3,
+    cycle_days         REAL NOT NULL DEFAULT 30,
+    PRIMARY KEY (facility_id, medicine_id)
+  );
+
+  CREATE TABLE IF NOT EXISTS indents (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    from_facility   TEXT NOT NULL REFERENCES facilities(id),
+    to_facility     TEXT NOT NULL REFERENCES facilities(id),
+    medicine_id     TEXT NOT NULL REFERENCES medicines(id),
+    qty             REAL NOT NULL,
+    justification   TEXT,
+    surge_flag      INTEGER NOT NULL DEFAULT 0,
+    near_expiry_note TEXT,
+    status          TEXT NOT NULL DEFAULT 'draft', -- 'draft' | 'approved' | 'sent' | 'rejected'
+    created_at      TEXT NOT NULL DEFAULT (datetime('now')),
+    approved_by     TEXT,
+    approved_at     TEXT
+  );
+
+  CREATE TABLE IF NOT EXISTS audit_log (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    ts          TEXT NOT NULL DEFAULT (datetime('now')),
+    actor       TEXT,
+    action      TEXT NOT NULL,
+    entity      TEXT NOT NULL,
+    entity_id   TEXT,
+    detail      TEXT DEFAULT '{}'
+  );
+
+  CREATE TABLE IF NOT EXISTS whatsapp_outbox (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    patient_id   TEXT NOT NULL REFERENCES patients(id),
+    encounter_id INTEGER REFERENCES encounters(id),
+    kind         TEXT NOT NULL,   -- 'voice' | 'text'
+    payload      TEXT NOT NULL,   -- JSON: { text } or { audioPath, text }
+    status       TEXT NOT NULL DEFAULT 'queued', -- 'queued' | 'sent' | 'mocked'
+    created_at   TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+`);
+
+export function logAudit(actor, action, entity, entityId, detail = {}) {
+  db.prepare(
+    'INSERT INTO audit_log (actor, action, entity, entity_id, detail) VALUES (?, ?, ?, ?, ?)'
+  ).run(actor || 'system', action, entity, String(entityId ?? ''), JSON.stringify(detail));
+}
+
+export function listAudit({ entity, entityId, limit = 200 } = {}) {
+  if (entity && entityId != null) {
+    return db
+      .prepare('SELECT * FROM audit_log WHERE entity = ? AND entity_id = ? ORDER BY id DESC LIMIT ?')
+      .all(entity, String(entityId), limit);
+  }
+  return db.prepare('SELECT * FROM audit_log ORDER BY id DESC LIMIT ?').all(limit);
 }

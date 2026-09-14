@@ -6,7 +6,9 @@
   "type": "module",
   "scripts": {
     "start": "node src/index.js",
-    "dev": "node --watch src/index.js"
+    "dev": "node --watch src/index.js",
+    "start:env": "node --env-file=.env src/index.js",
+    "dev:env": "node --watch --env-file=.env src/index.js"
   },
   "license": "ISC",
   "dependencies": {
