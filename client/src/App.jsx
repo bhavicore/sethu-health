@@ -6,6 +6,7 @@ import ChcView from './views/ChcView';
 import DeskView from './views/DeskView';
 import DoctorConsoleView from './views/DoctorConsoleView';
 import InventoryView from './views/InventoryView';
+import AuditLogView from './views/AuditLogView';
 import SyncStatusBar from './components/SyncStatusBar';
 import { initSyncEngine } from './lib/sync';
 
@@ -14,6 +15,7 @@ const NAV_ITEMS = [
   { role: 'doctor', label: 'Doctor' },
   { role: 'inventory', label: 'Inventory' },
   { role: 'chc', label: 'CHC' },
+  { role: 'audit', label: 'Audit Trail' },
   { role: 'phc', label: 'Referral (legacy)' },
 ];
 
@@ -68,6 +70,7 @@ export default function App() {
         )}
         {role === 'inventory' && <InventoryView facilityId="phc-1" />}
         {role === 'chc' && <ChcView />}
+        {role === 'audit' && <AuditLogView />}
         {role === 'phc' && <PhcView />}
       </main>
     </div>

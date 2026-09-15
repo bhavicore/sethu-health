@@ -239,5 +239,8 @@ export function listAudit({ entity, entityId, limit = 200 } = {}) {
       .prepare('SELECT * FROM audit_log WHERE entity = ? AND entity_id = ? ORDER BY id DESC LIMIT ?')
       .all(entity, String(entityId), limit);
   }
+  if (entity) {
+    return db.prepare('SELECT * FROM audit_log WHERE entity = ? ORDER BY id DESC LIMIT ?').all(entity, limit);
+  }
   return db.prepare('SELECT * FROM audit_log ORDER BY id DESC LIMIT ?').all(limit);
 }

@@ -36,4 +36,13 @@ export const careApi = {
   listIndents: (facility, direction) => request(`/indents?facility=${facility}&direction=${direction}`),
   approveIndent: (id, payload) => request(`/indents/${id}/approve`, { method: 'POST', body: JSON.stringify(payload) }),
   rejectIndent: (id, payload) => request(`/indents/${id}/reject`, { method: 'POST', body: JSON.stringify(payload) }),
+
+  audit: ({ entity, entityId, limit } = {}) => {
+    const params = new URLSearchParams();
+    if (entity) params.set('entity', entity);
+    if (entityId != null) params.set('entityId', entityId);
+    if (limit) params.set('limit', limit);
+    const qs = params.toString();
+    return request(`/audit${qs ? `?${qs}` : ''}`);
+  },
 };

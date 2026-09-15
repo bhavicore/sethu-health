@@ -3,6 +3,7 @@ const CHOICES = [
   { role: 'doctor', title: 'Doctor Console', desc: 'History first, then dictate. The agent drafts, flags, and never blocks.' },
   { role: 'inventory', title: 'PHC Inventory', desc: 'Stock, usage trends, surge flags, and agent-drafted indents.' },
   { role: 'chc', title: 'CHC', desc: 'Scan referral cards, review incoming indents, manage CHC stock.' },
+  { role: 'audit', title: 'Audit Trail', desc: 'Every registration, approval, override, and indent decision — who did it, and when.' },
   { role: 'phc', title: 'Referral (legacy demo)', desc: 'The original offline QR referral-card bridge between a PHC and a CHC.' },
 ];
 

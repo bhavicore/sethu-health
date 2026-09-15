@@ -354,5 +354,6 @@ careRouter.post('/indents/:id/reject', (req, res) => {
 // Audit trail (Doctor-in-Control Rule 7 — everything is logged)
 // ---------------------------------------------------------------------------
 careRouter.get('/audit', (req, res) => {
-  res.json({ entries: listAudit({ entity: req.query.entity, entityId: req.query.entityId }) });
+  const limit = Number(req.query.limit) || 200;
+  res.json({ entries: listAudit({ entity: req.query.entity, entityId: req.query.entityId, limit }) });
 });

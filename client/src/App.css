@@ -525,6 +525,35 @@ dd {
   margin-bottom: 0.3rem;
 }
 
+/* Audit trail */
+.audit-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.audit-list__item {
+  padding: 0.6rem 0.75rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.audit-list__meta {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.3rem;
+}
+
+.audit-list__item p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
 @media print {
   .app__nav,
   .no-print {
