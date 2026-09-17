@@ -1,0 +1,30 @@
+{
+  "backend": "mongomock",
+  "diseases": {
+    "heart": {
+      "n_records": 70000,
+      "n_at_risk": 31141,
+      "collection": "heart_predictions"
+    },
+    "diabetes": {
+      "n_records": 253680,
+      "n_at_risk": 8732,
+      "collection": "diabetes_predictions"
+    },
+    "kidney": {
+      "n_records": 4000,
+      "n_at_risk": 3878,
+      "collection": "kidney_predictions"
+    },
+    "liver": {
+      "n_records": 30691,
+      "n_at_risk": 22106,
+      "collection": "liver_predictions"
+    },
+    "stroke": {
+      "n_records": 5110,
+      "n_at_risk": 2,
+      "collection": "stroke_predictions"
+    }
+  }
+}

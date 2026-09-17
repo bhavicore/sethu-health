@@ -1,0 +1,141 @@
+{
+  "risk_prevalence_by_age": {
+    "heart": {
+      "<30": {
+        "n": 3,
+        "n_positive": 0,
+        "risk_prevalence": 0.0
+      },
+      "30-44": {
+        "n": 10269,
+        "n_positive": 3056,
+        "risk_prevalence": 0.2976
+      },
+      "45-59": {
+        "n": 46948,
+        "n_positive": 23358,
+        "risk_prevalence": 0.4975
+      },
+      "60-74": {
+        "n": 12780,
+        "n_positive": 8565,
+        "risk_prevalence": 0.6702
+      },
+      "75+": null
+    },
+    "diabetes": {
+      "<30": {
+        "n": 13298,
+        "n_positive": 218,
+        "risk_prevalence": 0.0164
+      },
+      "30-44": {
+        "n": 41103,
+        "n_positive": 1991,
+        "risk_prevalence": 0.0484
+      },
+      "45-59": {
+        "n": 76965,
+        "n_positive": 9093,
+        "risk_prevalence": 0.1181
+      },
+      "60-74": {
+        "n": 88971,
+        "n_positive": 17432,
+        "risk_prevalence": 0.1959
+      },
+      "75+": {
+        "n": 33343,
+        "n_positive": 6612,
+        "risk_prevalence": 0.1983
+      }
+    },
+    "kidney": null,
+    "liver": {
+      "<30": {
+        "n": 5794,
+        "n_positive": 4119,
+        "risk_prevalence": 0.7109
+      },
+      "30-44": {
+        "n": 9150,
+        "n_positive": 6507,
+        "risk_prevalence": 0.7111
+      },
+      "45-59": {
+        "n": 9488,
+        "n_positive": 6809,
+        "risk_prevalence": 0.7176
+      },
+      "60-74": {
+        "n": 5413,
+        "n_positive": 3897,
+        "risk_prevalence": 0.7199
+      },
+      "75+": {
+        "n": 844,
+        "n_positive": 583,
+        "risk_prevalence": 0.6908
+      }
+    },
+    "stroke": {
+      "<30": {
+        "n": 1515,
+        "n_positive": 2,
+        "risk_prevalence": 0.0013
+      },
+      "30-44": {
+        "n": 1018,
+        "n_positive": 8,
+        "risk_prevalence": 0.0079
+      },
+      "45-59": {
+        "n": 1201,
+        "n_positive": 58,
+        "risk_prevalence": 0.0483
+      },
+      "60-74": {
+        "n": 858,
+        "n_positive": 79,
+        "risk_prevalence": 0.0921
+      },
+      "75+": {
+        "n": 518,
+        "n_positive": 102,
+        "risk_prevalence": 0.1969
+      }
+    }
+  },
+  "model_roc_auc_comparison": {
+    "heart": {
+      "LogisticRegression": 0.7838,
+      "RandomForestClassifier": 0.7968,
+      "GBTClassifier": 0.8014,
+      "best_model": "GBTClassifier"
+    },
+    "diabetes": {
+      "LogisticRegression": 0.8169,
+      "RandomForestClassifier": 0.8066,
+      "GBTClassifier": 0.8206,
+      "best_model": "GBTClassifier"
+    },
+    "kidney": {
+      "LogisticRegression": 0.9992,
+      "RandomForestClassifier": 0.9903,
+      "GBTClassifier": 0.9255,
+      "best_model": "LogisticRegression"
+    },
+    "liver": {
+      "LogisticRegression": 0.7566,
+      "RandomForestClassifier": 0.9316,
+      "GBTClassifier": 0.9966,
+      "best_model": "GBTClassifier"
+    },
+    "stroke": {
+      "LogisticRegression": 0.852,
+      "RandomForestClassifier": 0.8637,
+      "GBTClassifier": 0.8283,
+      "best_model": "RandomForestClassifier"
+    }
+  }
+}

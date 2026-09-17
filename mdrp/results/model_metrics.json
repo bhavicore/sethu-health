@@ -1,0 +1,187 @@
+{
+  "heart": {
+    "n_rows": 70000,
+    "positive_rate": 0.4997,
+    "class_weighting_applied": false,
+    "metrics_by_model": {
+      "LogisticRegression": {
+        "accuracy": 0.722029825429359,
+        "precision": 0.7238564658672607,
+        "recall": 0.722029825429359,
+        "f1": 0.7216609920079822,
+        "roc_auc": 0.7837696880682612
+      },
+      "RandomForestClassifier": {
+        "accuracy": 0.7307936956675384,
+        "precision": 0.7363947217759235,
+        "recall": 0.7307936956675383,
+        "f1": 0.7295189824723827,
+        "roc_auc": 0.7967796594928358
+      },
+      "GBTClassifier": {
+        "accuracy": 0.7323485758710863,
+        "precision": 0.7353840139926182,
+        "recall": 0.7323485758710864,
+        "f1": 0.7317210529584384,
+        "roc_auc": 0.8014173211038508
+      }
+    },
+    "best_model": "GBTClassifier",
+    "best_metrics": {
+      "accuracy": 0.7323485758710863,
+      "precision": 0.7353840139926182,
+      "recall": 0.7323485758710864,
+      "f1": 0.7317210529584384,
+      "roc_auc": 0.8014173211038508
+    },
+    "model_path": "/home/user/sethu-health/mdrp/models/heart/GBTClassifier"
+  },
+  "diabetes": {
+    "n_rows": 253680,
+    "positive_rate": 0.13933301797540207,
+    "class_weighting_applied": false,
+    "metrics_by_model": {
+      "LogisticRegression": {
+        "accuracy": 0.8637597890677265,
+        "precision": 0.8314954153213321,
+        "recall": 0.8637597890677267,
+        "f1": 0.8285170048221812,
+        "roc_auc": 0.8169217430574726
+      },
+      "RandomForestClassifier": {
+        "accuracy": 0.8604934870725276,
+        "precision": 0.8293913198366476,
+        "recall": 0.8604934870725276,
+        "f1": 0.8010851218003434,
+        "roc_auc": 0.8065792205002185
+      },
+      "GBTClassifier": {
+        "accuracy": 0.8649010271142419,
+        "precision": 0.8340316445444477,
+        "recall": 0.8649010271142419,
+        "f1": 0.8280474129257392,
+        "roc_auc": 0.820640282883513
+      }
+    },
+    "best_model": "GBTClassifier",
+    "best_metrics": {
+      "accuracy": 0.8649010271142419,
+      "precision": 0.8340316445444477,
+      "recall": 0.8649010271142419,
+      "f1": 0.8280474129257392,
+      "roc_auc": 0.820640282883513
+    },
+    "model_path": "/home/user/sethu-health/mdrp/models/diabetes/GBTClassifier"
+  },
+  "kidney": {
+    "n_rows": 4000,
+    "positive_rate": 0.96875,
+    "class_weighting_applied": false,
+    "metrics_by_model": {
+      "LogisticRegression": {
+        "accuracy": 0.9932614555256065,
+        "precision": 0.9930710279966729,
+        "recall": 0.9932614555256064,
+        "f1": 0.9930219281346755,
+        "roc_auc": 0.9992424242424243
+      },
+      "RandomForestClassifier": {
+        "accuracy": 0.9851752021563343,
+        "precision": 0.9853982839296316,
+        "recall": 0.9851752021563343,
+        "f1": 0.9827605957535869,
+        "roc_auc": 0.9903409090909091
+      },
+      "GBTClassifier": {
+        "accuracy": 0.9892183288409704,
+        "precision": 0.9888326825006907,
+        "recall": 0.9892183288409704,
+        "f1": 0.9889690992718757,
+        "roc_auc": 0.9255366161616162
+      }
+    },
+    "best_model": "LogisticRegression",
+    "best_metrics": {
+      "accuracy": 0.9932614555256065,
+      "precision": 0.9930710279966729,
+      "recall": 0.9932614555256064,
+      "f1": 0.9930219281346755,
+      "roc_auc": 0.9992424242424243
+    },
+    "model_path": "/home/user/sethu-health/mdrp/models/kidney/LogisticRegression"
+  },
+  "liver": {
+    "n_rows": 30691,
+    "positive_rate": 0.7141181453846405,
+    "class_weighting_applied": false,
+    "metrics_by_model": {
+      "LogisticRegression": {
+        "accuracy": 0.7204846897003438,
+        "precision": 0.6746261351515155,
+        "recall": 0.7204846897003438,
+        "f1": 0.6709571712823541,
+        "roc_auc": 0.7566042637941076
+      },
+      "RandomForestClassifier": {
+        "accuracy": 0.8450957917144261,
+        "precision": 0.843334434588183,
+        "recall": 0.8450957917144261,
+        "f1": 0.8342580370405678,
+        "roc_auc": 0.9316218794541875
+      },
+      "GBTClassifier": {
+        "accuracy": 0.9847715736040609,
+        "precision": 0.9847664453710783,
+        "recall": 0.984771573604061,
+        "f1": 0.9847131252592476,
+        "roc_auc": 0.9966229278138687
+      }
+    },
+    "best_model": "GBTClassifier",
+    "best_metrics": {
+      "accuracy": 0.9847715736040609,
+      "precision": 0.9847664453710783,
+      "recall": 0.984771573604061,
+      "f1": 0.9847131252592476,
+      "roc_auc": 0.9966229278138687
+    },
+    "model_path": "/home/user/sethu-health/mdrp/models/liver/GBTClassifier"
+  },
+  "stroke": {
+    "n_rows": 5110,
+    "positive_rate": 0.0487279843444227,
+    "class_weighting_applied": true,
+    "metrics_by_model": {
+      "LogisticRegression": {
+        "accuracy": 0.7163120567375887,
+        "precision": 0.9419673142152327,
+        "recall": 0.7163120567375886,
+        "f1": 0.792487522983977,
+        "roc_auc": 0.8519832745128098
+      },
+      "RandomForestClassifier": {
+        "accuracy": 0.9432624113475178,
+        "precision": 0.8897439766611338,
+        "recall": 0.9432624113475178,
+        "f1": 0.9157219029870063,
+        "roc_auc": 0.863712214208991
+      },
+      "GBTClassifier": {
+        "accuracy": 0.9381965552178319,
+        "precision": 0.8984295845997974,
+        "recall": 0.9381965552178317,
+        "f1": 0.9149542341031703,
+        "roc_auc": 0.8283335890747283
+      }
+    },
+    "best_model": "RandomForestClassifier",
+    "best_metrics": {
+      "accuracy": 0.9432624113475178,
+      "precision": 0.8897439766611338,
+      "recall": 0.9432624113475178,
+      "f1": 0.9157219029870063,
+      "roc_auc": 0.863712214208991
+    },
+    "model_path": "/home/user/sethu-health/mdrp/models/stroke/RandomForestClassifier"
+  }
+}

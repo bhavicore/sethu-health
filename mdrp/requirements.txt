@@ -1,0 +1,7 @@
+pyspark==3.5.1
+pandas
+numpy
+pyarrow
+pymongo
+mongomock
+scikit-learn
