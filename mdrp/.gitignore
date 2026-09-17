@@ -1,2 +1,3 @@
 hdfs_sim/
 data/processed/
+__pycache__/
